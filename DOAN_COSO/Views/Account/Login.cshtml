@@ -1,0 +1,62 @@
+﻿@using DOAN_COSO.Models
+@model LoginViewModel
+@{
+
+    Layout = "~/Views/Shared/LayoutTrangChu.cshtml";
+    ViewBag.Title = "Đăng Nhập Hệ Thống";
+}
+<div class="row"style="margin-top:100px ; margin-left:400px">
+    <div class="col-md-8">
+        <section id="loginForm">
+            @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                <h2>@ViewBag.Title.</h2>
+
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label text text-warning" })
+                    <div class="col-md-10">
+                        <input class="border-lg border-primary font-weight" data-val="true" data-val-email="The Email field is not a valid e-mail address." data-val-required="The Email field is required." id="Email" name="Email" placeholder="Nhập Email Của Bạn" type="text" value="" /></div>
+                    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "col-md-2 control-label text-danger" })
+
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label text text-warning" })
+                    <div class="col-md-10">
+                        @Html.PasswordFor(m => m.Password, new { @class = "border-lg border-primary font-weight", @placeholder = "Nhập Mật Khẩu Của Bạn" })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "col-md-2 control-label text-danger" })
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <input data-val="true" data-val-required="The Remember me? field is required." id="RememberMe" name="RememberMe" type="checkbox" value="true" /><input name="RememberMe" type="hidden" value="false" />
+                            <label for="RememberMe">Lưu Mật Khẩu</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-lg-4"style="height:50px">
+                        <input type="submit" value="Đăng nhập" class="btn btn-primary btn-outline-primary" />
+                    </div>
+                </div>
+                <p>
+                    @Html.ActionLink("Đăng ký tài khoản mới", "Register")
+                </p>
+                <p>
+                    @Html.ActionLink("Quên mật khẩu?", "ForgotPassword")
+                </p>
+            }
+        </section>
+    </div>
+@*    <div class="col-md-4">
+        <section id="socialLoginForm">
+            @Html.Partial("_ExternalLoginsListPartial", new ExternalLoginListViewModel { ReturnUrl = ViewBag.ReturnUrl })
+        </section>
+    </div>*@
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

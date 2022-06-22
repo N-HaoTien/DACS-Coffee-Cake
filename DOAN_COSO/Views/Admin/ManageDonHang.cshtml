@@ -1,0 +1,164 @@
+﻿@model PagedList.IPagedList<DOAN_COSO.Models.HoaDon>
+@using PagedList.Mvc;
+@{
+    //onclick = "location.href = '@Url.Action("Status", new { id = item.IDSP })'"
+    ViewBag.Title = "ListSanPham";
+    Layout = "~/Views/Shared/LayoutAdmin.cshtml";
+}
+<div class="product-status mg-b-30">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="product-status-wrap">
+                    <div class="breadcomb-wp" style="margin-bottom:20px">
+                        <div class="breadcomb-icon">
+                            <a href="~/Admin/ManageDonHang"><i class="icon nalika-home"></i></a>
+                        </div>
+                        <div class="breadcomb-ctn" style="margin-left:15px;margin-top:15px">
+                            <h2>Danh Sách Đơn Hàng</h2>
+                        </div>
+                    </div>
+                    <div id="alertMessage">
+                        @Html.Partial("_Message")
+                    </div>
+                    @using (Html.BeginForm("ManageDonHang", "Admin",FormMethod.Post))
+                    {
+                <div class="row">
+                    <div class="col-md-2">
+                        <input type="date" id="From" class="form-control mx-lg-3" value="@ViewData["From"]" name="From" placeholder="Từ Ngày">
+
+                    </div>
+                    <div class="col-md-2">
+                        <input type="date" id="To" class="form-control mx-lg-3" value="@ViewData["To"]" name="To" placeholder="Đến">
+
+                    </div>
+                    <div class="col-md-2">
+                        @Html.DropDownList("Duyet", (IEnumerable<SelectListItem>)ViewBag.List, "Tất cả trạng thái", htmlAttributes: new { @class = "form-control" })
+
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control mx-lg-3" value="@ViewBag.KeyWord" name="searchString" placeholder="Nhập mã đơn hàng">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="submit" class="btn btn-primary" value="Search">
+                    </div>
+                </div>
+                    }
+                    <table>
+                        <tr>
+                            <th>Mã Hóa Đơn</th>
+                            <th>Địa Chỉ </th>
+                            <th>Tên Khách Hàng</th>
+                            <th>Ngày Lập</th>
+                            <th>Ngày Giao</th>
+                            <th>Tổng Tiền</th>
+                            <th style="text-align:center">Tình Trạng</th>
+                        </tr>
+                        @foreach (var item in Model)
+                        {
+                    <tr id="product @item.IDHD">
+                        <td>@item.IDHD</td>
+                        <td>@item.User.Address</td>
+                        <td>@item.User.Name</td>
+
+                        <td>@item.NgayDat</td>
+                        <td>@Html.DisplayFor(modelItem => item.NgayGiao)</td>
+                        <td>@item.TongTien</td>
+
+                        <td style="text-align:center">
+
+                            <button class="ajax-fix-to-status @(item.TinhTrangDH == true ? "pd-setting" : "ds-setting") " data-id="@item.IDHD" style="width:160px;height:30px">@(item.TinhTrangDH == true ? "Đã Duyệt" : "Chưa Duyệt")</button>
+
+                        </td>
+                        <td style="text-align:center">
+
+                            <p>@(item.IsPaid == true ? "Đã Thanh Toán" : "Chưa Thanh Toán")</p>
+
+                        </td>
+
+                    </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div style="margin-left:15px">
+    <div>
+        <p class="text-primary">
+            Trang <strong class="text-danger">@(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber)</strong> /
+            @Model.PageCount
+        </p>
+    </div>
+    <div class="MenuTrang">
+        @Html.PagedListPager(Model, page => Url.Action("ManageDonHang", new
+   {
+       page = page,
+       searchString = ViewBag.Keyword,
+       LoaiSanPhamId = ViewBag.LoaiSanPhamId,
+       Duyet = ViewBag.List
+   }))
+    </div>
+</div>
+<style>
+    .MenuTrang li {
+        display: inline;
+    }
+</style>
+<script src="~/Scripts/jquery-3.4.1.js"></script>
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            $(".ajax-fix-to-status").click(function (e) {
+                e.preventDefault();
+                var btn = $(this);
+                $.ajax({
+                    type: 'Get',
+                    url: '/Admin/StatusHD',
+                    data: {
+                        id: $(this).data("id"),
+                    },
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        console.log(data);
+                        if (data.abc == true) {
+                            btn.text("Đã Duyệt");
+                            $(btn).removeClass('ds-setting');
+                            $(btn).addClass('pd-setting');
+                            $('#alertMessage').delay(1000).slideUp(500);
+                            toastr.options =
+                            {
+                                "closeButton": true,
+                                "progressBar": true
+                            }
+                            toastr.success("Đơn Hàng Đã Duyệt", "Thông Báo");
+                        }
+                        else {
+                            btn.text("Chưa Duyệt");
+                            $(btn).removeClass('pd-setting');
+                            $(btn).addClass('ds-setting');
+                            toastr.options =
+                            {
+                                "closeButton": true,
+                                "progressBar": true
+                            }
+                            toastr.error("Đơn Hàng Chưa duyệt", "Thông Báo");
+
+                        }
+
+
+                    },
+                    error: function () {
+                        alert("error");
+                    }
+                });
+            });
+            
+        });
+    </script>
+
+}

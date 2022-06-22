@@ -1,0 +1,183 @@
+﻿@model IEnumerable<DOAN_COSO.Models.CartModel>
+
+@{
+    ViewBag.Title = "GioHang";
+    Layout = "~/Views/Shared/LayoutTrangChu.cshtml";
+}
+
+@if (Model.Count() > 0)
+{
+    <section class="ftco-section ftco-cart ">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 ftco-animate">
+                    <div class="cart-list">
+                        <table class="table">
+                            <thead class="thead-primary">
+                                <tr class="text-center">
+                                    <th>&nbsp;</th>
+                                    <th>&nbsp;</th>
+                                    <th>Tên Sản Phẩm</th>
+                                    <th>Giá</th>
+                                    <th>Số Lượng</th>
+                                    <th>Thành Tiền</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+
+                                    <tr id="giohang @item.SanPham.IDSP" class="text-center productlayluon">
+                                        <td class="product-remove"><a href="#" class="ajax-remove-to-cart IDSP" data-id="@item.SanPham.IDSP"><span class="icon-close"></span></a></td>
+
+                                        <td class="image-prod"><div class="img" style="background-image:url(@item.SanPham.Hinh)"></div></td>
+
+                                        <td class="product-name">
+                                            <h3>@item.SanPham.tenSP</h3>
+                                        </td>
+
+                                        <td class="price">@item.SanPham.GiaBan.ToString("#,##0")</td>
+
+                                        <td class="quantity">
+                                            <div class="input-group mb-3">
+                                                <input data-id="@item.SanPham.IDSP" type="number" class="abcquantity quantity form-control input-number" value="@item.Quantity" min="1" max="100">
+                                            </div>
+                                        </td>
+
+                                        <td class="total ThanhTien">@item.ThanhTien.ToString("#,##0")</td>
+
+                                        <td>
+                                            <input type="button" class="ajax-up-to-cart btn btn-success"id="@item.SanPham.IDSP" value="Cập Nhật" />
+                                        </td>
+                                    </tr><!-- END TR-->
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-end thanhtienlayluon" >
+                <div class="col col-lg-3 col-md-6 mt-5 cart-wrap ftco-animate">
+                    <div class="cart-total mb-3">
+                        <h3>Cart Totals</h3>
+                        <p class="d-flex">
+                            <span>Tổng Số Lượng:</span>
+                            <span id="CartSum">@ViewBag.TongSLSP</span>
+                        </p>
+                        <p class="d-flex">
+                            <span>Số Món:</span>
+                            <span id="CartSumProduct">@ViewBag.TongSL</span>
+                        </p>
+                        <hr>
+                        <p class="d-flex total-price">
+                            <span>Tổng Tiền</span>
+                            <span id="TongTien">@ViewBag.TongTien.ToString("#,##0") VNĐ</span>
+                        </p>
+                    </div>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <p class="text-center"><a href="@Url.Action("Checkout","GioHang")" class="btn btn-primary py-3 px-4">Đặt Hàng</a></p>
+                    }
+                    else
+                    {
+                    <p class="text-center"><a href="@Url.Action("Login","Account", new {ReturnUrl = Url.Action("Checkout","GioHang") })" class="btn btn-primary py-3 px-4">Đặt Hàng</a></p>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+else
+{
+    <section class="ftco-section ftco-cart">
+        <div class="container"></div>
+        <div class="row"></div>
+        <div class="col-md-12 ftco-animate">
+
+            <h3 style="text-align:center">Chưa có sản phẩm nào trong giỏ hàng</h3>
+        </div>
+    </section>
+}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+@section updown{
+    <script>
+        $(document).ready(function () {
+            $(".ajax-up-to-cart").click(function () {
+                var thisClick = $(this);
+                var ID = $(this).closest('.productlayluon').find('.IDSP').data("id");
+                var soluong = $(this).closest('.productlayluon').find('.abcquantity').val();
+                $.ajax({
+                    type: 'Post',
+                    url: '/GioHang/CapNhatGioHang',
+                    data: {
+                        IDSP: ID,
+                        quantity: soluong
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        console.log(data);
+                        $('#CartSum').text(data.Sum);
+                        thisClick.closest('.productlayluon').find('.ThanhTien').text(data.ThanhTien);
+                        $('#TongTien').text(data.TongTien);
+                        toastr.options =
+                        {
+                            "closeButton": true,
+                            "progressBar": true
+                        }
+                        toastr.success("Bạn đã thay đổi số lượng sản phẩm", "Thông Báo");
+                    },
+                    error: function () {
+                        toastr.options =
+                        {
+                            "closeButton": true,
+                            "progressBar": true
+                        }
+                        toastr.error("Mời bạn nhập lại số lượng sản phẩm", "Thông Báo");
+                    },
+                });
+                return false;
+            });
+        });
+        $(document).ready(function () {
+
+            $(".ajax-remove-to-cart").click(function () {
+                var ID = $(this).closest('.productlayluon').find('.abcquantity').data("id");
+                var btn = $(this);
+                var idproduct = btn.data("id");
+                $.ajax({
+                    type: 'Post',
+                    url: '/GioHang/Remove',
+                    data: {
+                        IDSP: ID
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        console.log(data);
+                        var row = document.getElementById('giohang ' + idproduct)
+                        row.style.display = "none";
+                        $('#CartSumProduct').text(data.Count);
+                        $('#CartCount').text(data.Count);
+                        $('#CartSum').text(data.Sum);
+                        btn.closest('.productlayluon').find('.ThanhTien').text(data.ThanhTien);
+                        $('#TongTien').text(data.TongTien);
+                        toastr.options =
+                        {
+                            "closeButton": true,
+                            "progressBar": true
+                        }
+                        toastr.success("Bạn đã xóa sản phẩm trong giỏ hàng", "Thông Báo");
+                    },
+                    error: function () {
+                        alert("Lỗi trong khi thêm vào giỏ hàng!");
+                    },
+                });
+                return false;
+            });
+        });
+    </script>
+}

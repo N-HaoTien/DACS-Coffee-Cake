@@ -1,0 +1,193 @@
+﻿@model PagedList.IPagedList<DOAN_COSO.Models.SanPham>
+@using PagedList.Mvc;
+@{
+    //onclick = "location.href = '@Url.Action("Status", new { id = item.IDSP })'"
+    ViewBag.Title = "ListSanPham";
+    Layout = "~/Views/Shared/LayoutAdmin.cshtml";
+}
+<div class="product-status mg-b-30">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="product-status-wrap">
+                    <div class="breadcomb-wp" style="margin-bottom:20px">
+                        <div class="breadcomb-icon">
+                            <a href="~/Admin/ListSanPham"><i class="icon nalika-home"></i></a>
+                        </div>
+                        <div class="breadcomb-ctn" style="margin-left:15px;margin-top:15px">
+                            <h2>Danh Sách Sản Phẩm</h2>
+                        </div>
+                    </div>
+                    <div class="add-product">
+                        <a href="~/Admin/CreateSanPham">Thêm Sản Phẩm</a>
+                    </div>
+                    <div id="alertMessage">
+                        @Html.Partial("_Message")
+                    </div>
+                    @using (Html.BeginForm("ListSanPham", "Admin", FormMethod.Get))
+                    {
+                        <div class="row">
+                            <div class="col-md-2">
+                                @Html.DropDownList("LoaiSanPhamId", null, "Nhập Loại Sản Phẩm", htmlAttributes: new { @class = "form-control" })
+
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control mx-lg-3" value="@ViewBag.KeyWord" name="searchString" placeholder="Nhập tên Sản Phẩm cần tìm">
+                            </div>
+                            <div class="col-md-2">
+                                <input type="submit" class="btn btn-primary" value="Search">
+                            </div>
+                        </div>
+                    }
+                    <table>
+                        <tr>
+                            <th>Mã Sản Phẩm</th>
+                            <th>Tên Sản Phẩm</th>
+                            <th>Hình Ảnh</th>
+                            <th>Giá Bán</th>
+                            <th style="text-align:center">Loại Sản Phẩm</th>
+                            <th style="text-align:center">Trạng Thái</th>
+                            <th>Action</th>
+                        </tr>
+                        @foreach (var item in Model)
+                        {
+                            <tr id="product @item.IDSP">
+                                <td>@Html.DisplayFor(modelItem => item.IDSP)</td>
+                                <td>@Html.DisplayFor(modelItem => item.tenSP)</td>
+                                <td><img src="@item.Hinh" alt="Alternate Text" /></td>
+                                <td>@Html.DisplayFor(modelItem => item.GiaBan)</td>
+                                <td style="text-align:center">@Html.DisplayFor(modelItem => item.LoaiSanPham.tenLoaiSP)</td>
+                                <td style="text-align:center">
+
+                                    <button class="ajax-fix-to-status @(item.TinhTrang == true ? "pd-setting" : "ds-setting") " data-id="@item.IDSP" style="width:160px;height:30px">@(item.TinhTrang ? "Đang Hoạt Động" : "Ngừng Hoạt Động")</button>
+
+                                </td>
+                                <td>
+                                    <button data-toggle="tooltip" title="Edit" class="pd-setting-ed" onclick="location.href = '@Url.Action("EditSanPham", new { id = item.IDSP })'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>
+                                    <button data-toggle="tooltip" data-id="@item.IDSP" title="Trash" class="ajax-delete-to-status pd-setting-ed"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                                </td>
+
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div style="margin-left:15px">
+    <div>
+        <p class="text-primary">
+            Trang <strong class="text-danger">@(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber)</strong> /
+            @Model.PageCount
+        </p>
+    </div>
+    <div class="MenuTrang">
+        @Html.PagedListPager(Model, page => Url.Action("ListSanPham","Admin", new
+   {
+       page = page,
+       searchString = ViewBag.Keyword,
+       LoaiSanPhamId = ViewBag.LoaiSanPhamId
+   }))
+    </div>
+</div>
+<style>
+    .MenuTrang li {
+        display: inline;
+    }
+</style>
+<script src="~/Scripts/jquery-3.4.1.js"></script>
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            $(".ajax-fix-to-status").click(function (e) {
+                e.preventDefault();
+                var btn = $(this);
+                $.ajax({
+                    type: 'Get',
+                    url: '/Admin/Status',
+                    data: {
+                        IDSP: $(this).data("id"),
+                    },
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        console.log(data);
+                        if (data.abc == true) {
+                            btn.text("Đang Hoạt Động");
+                            $(btn).removeClass('ds-setting');
+                            $(btn).addClass('pd-setting');
+                            $('#alertMessage').delay(1000).slideUp(500);
+                            toastr.options =
+                            {
+                                "closeButton": true,
+                                "progressBar": true
+                            }
+                            toastr.success("Hoạt Động Bình thường", "Thông Báo");
+                        }
+                        else {
+                            btn.text("Ngừng Hoạt Động");
+                            $(btn).removeClass('pd-setting');
+                            $(btn).addClass('ds-setting');
+                            toastr.options =
+                            {
+                                "closeButton": true,
+                                "progressBar": true
+                            }
+                            toastr.error("Sản phẩm ngừng hoạt động", "Thông Báo");
+
+                        }
+
+
+                    },
+                    error: function () {
+                        alert("error");
+                    }
+                });
+            });
+            $(".ajax-delete-to-status").click(function (e) {
+                if (confirm('Bạn có chắc xóa sản phẩm này không ?') == true) {
+                    e.preventDefault();
+                    var btn = $(this);
+                    var idproduct = btn.data("id");
+                    $.ajax({
+                        type: 'GET',
+                        url: '/Admin/DeleteConfirmed',
+                        data: {
+                            id: btn.data("id"),
+                        },
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (data) {
+                            console.log(data);
+                            var row = document.getElementById('product ' + idproduct)
+                            row.style.display = "none";
+                            toastr.options =
+                            {
+                                "closeButton": true,
+                                "progressBar": true
+                            }
+                            toastr.success("Bạn đã xóa sản phẩm thành công !", "Thông Báo");
+
+                        },
+                        error: function (data) {
+
+                            if (data.result == false) {
+                                toastr.options =
+                                {
+                                    "closeButton": true,
+                                    "progressBar": true
+                                }
+                                toastr.warning("Xóa Thất Bại", "Thông Báo");
+                            }
+                            
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+}

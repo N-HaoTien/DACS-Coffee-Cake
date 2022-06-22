@@ -1,0 +1,10 @@
+﻿@{
+    Layout = "~/Views/Shared/LayoutTrangChu.cshtml";
+    ViewBag.Title = "Confirm Email";
+}
+
+<div>
+    <h2 style="margin-left:300px;margin-top:150px" class="text-warning">
+        Bạn đã xác thực Email @Html.ActionLink("Nhấn vào đây để đăng nhập", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })
+    </h2>
+</div>

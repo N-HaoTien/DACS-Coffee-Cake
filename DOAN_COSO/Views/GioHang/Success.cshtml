@@ -1,0 +1,33 @@
+﻿
+@{
+    ViewBag.Title = "Success";
+    Layout = "~/Views/Shared/LayoutTrangChu.cshtml";
+
+
+}
+@if (User.Identity.IsAuthenticated)
+{
+    <div class="row" style="margin-top:100px;margin-left:50px">
+        <div class="col-md-10">
+            <h2>Đơn hàng đã đặt thành công !</h2>
+
+        </div>
+        <div class="col-md-10">
+            <h2>Vui Lòng Kiểm Tra Mail của bạn</h2>
+        </div>
+    </div>
+}
+@section success{
+    <script>
+        function Message() {
+
+            toastr.options =
+            {
+                "closeButton": true,
+                "progressBar": true
+            }
+            toastr.success("Đặt hàng thành công", "Thông Báo");
+        }
+        Message();
+    </script>
+}

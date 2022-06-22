@@ -1,0 +1,79 @@
+﻿@model IEnumerable<DOAN_COSO.Models.HoaDon>
+
+@{
+    ViewBag.Title = "DonHangKH";
+    Layout = "~/Views/Shared/LayoutTrangChu.cshtml";
+
+
+}
+@if (User.Identity.IsAuthenticated)
+{
+    <section class="ftco-section ftco-cart ">
+        <div class="container">
+            <div class="row">
+
+                <div class="col-sm-1">
+                    <div id="Place">
+
+                    </div>
+                </div>
+                <div class="col-md-12 ftco-animate">
+
+                    <div class="cart-list">
+                        <table class="table">
+                            <thead class="thead-primary">
+                                <tr class="text-center">
+                                    <th>Mã Đơn Hàng</th>
+                                    <th>Ngày Đặt</th>
+                                    <th>Ngày Giao</th>
+                                    <th>Thành Tiền</th>
+                                    <th>Trạng Thái</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+
+                                    <tr class="text-center productlayluon">
+                                        <td class="product-name">
+                                            <h3>@item.IDHD</h3>
+                                        </td>
+
+                                        <td class="price">@item.NgayDat</td>
+
+                                        <td class="price">@item.NgayGiao</td>
+
+                                        <td class="total ThanhTien">@item.TongTien</td>
+                                        <td class="@(item.TinhTrangDH == false ? "price" : "price text-success")">@(item.TinhTrangDH == false ? "Đang Giao" : "Đã Giao")</td>
+                                        <td>
+                                            <button type="button" data-toggle="modal" data-target="#DetailsDH" data-url="@Url.Action("DetailsHD","Home",new {id = item.IDHD })" style="color:white" class="btn btn-success">Chi tiết </button>
+                                        </td>
+                                    </tr><!-- END TR-->
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+}
+
+
+
+<script type="text/javascript">
+    var PlaceEle = $('#Place');
+    $('button[data-toggle ="modal"]').click(function (e) {
+        e.preventDefault();
+        var url = $(this).data('url');
+        var decor = decodeURIComponent(url);
+        $.get(decor).done(function (data) {
+            PlaceEle.html(data);
+            PlaceEle.find('.modal').modal('show');
+            window.location('/Home/DonHangKH')
+        })
+    })
+</script>

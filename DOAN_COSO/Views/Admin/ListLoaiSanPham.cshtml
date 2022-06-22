@@ -1,0 +1,113 @@
+﻿@model PagedList.IPagedList<DOAN_COSO.Models.LoaiSanPham>
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "ListLoaiSanPham";
+    Layout = "~/Views/Shared/LayoutAdmin.cshtml";
+}
+<div class="product-status mg-b-30" style="margin-top:20px">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="product-status-wrap">
+                    <h4>Danh Sách Loại Sản Phẩm</h4>
+                    <div class="add-product">
+                        <a href="~/Admin/CreateLoaiSanPham">Thêm Loại Sản Phẩm</a>
+                    </div>
+                    <div id="alertMessage">
+                        @Html.Partial("_Message")
+                    </div>
+                    <table>
+                        <tr>
+                            <th>Mã Sản Phẩm</th>
+                            <th>Tên Loại Sản Phẩm</th>
+                            <th>Action</th>
+                        </tr>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                @Html.HiddenFor(m => item.IDLoaiSP)
+                                <td>@Html.DisplayFor(modelItem => item.IDLoaiSP)</td>
+                                <td>@Html.DisplayFor(modelItem => item.tenLoaiSP)</td>
+                                <td>
+
+                                    <button data-toggle="tooltip" title="Edit" class="pd-setting-ed" onclick="location.href = '@Url.Action("EditLoaiSanPham", new { id = item.IDLoaiSP })'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>
+                                    <button data-id="@item.IDLoaiSP" data-toggle="tooltip" title="Trash" class="ajax-delete pd-setting-ed"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                                </td>
+                            </tr>
+                        }
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div style="margin-left:15px">
+    <div>
+        <p class="text-primary">
+            Trang <strong class="text-danger">@(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber)</strong> /
+            @Model.PageCount
+        </p>
+    </div>
+    <div class="MenuTrang">
+        @Html.PagedListPager(Model, page => Url.Action("ListLoaiSanPham", new
+        {
+            page = page
+        }))
+    </div>
+</div>
+<style>
+    .MenuTrang li {
+        display: inline;
+    }
+</style>
+<script src="~/Scripts/jquery-3.4.1.js"></script>
+@section loaisp{
+    <script type="text/javascript">
+        $(function () {
+            $(".ajax-delete").click(function (e) {
+                if (confirm('Bạn có chắc xóa sản phẩm này không ?') == true) {
+                    e.preventDefault();
+                    var btn = $(this);
+                    $.ajax({
+                        type: 'GET',
+                        url: '/Admin/DeleteConfirmedLOAISP',
+                        data: {
+                            id: btn.data("id"),
+                        },
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (data) {
+                            console.log(data);
+                            if (data.result == true) {
+                                location.reload('/Admin/ListLoaiSanPham');
+                                toastr.options =
+                                {
+                                    "closeButton": true,
+                                    "progressBar": true
+                                }
+                                toastr.success("Xóa Thành Công", "Thông Báo");
+                            }
+                            else {
+                                toastr.options =
+                                {
+                                    "closeButton": true,
+                                    "progressBar": true
+                                }
+                                toastr.error("Xóa Thất Bại", "Thông Báo");
+                            }
+
+                        },
+                        error: function (data) {
+
+                            alert('abc')
+
+
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+}

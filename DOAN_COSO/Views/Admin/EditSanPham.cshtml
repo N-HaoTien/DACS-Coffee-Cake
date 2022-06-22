@@ -1,0 +1,160 @@
+﻿@model DOAN_COSO.Models.SanPham
+
+@{
+    ViewBag.Title = "EditSanPham";
+    Layout = "~/Views/Shared/LayoutAdmin.cshtml";
+}
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.IDSP)
+    <div class="breadcome-area">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="breadcome-list">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                <div class="breadcomb-wp">
+                                    <div class="breadcomb-icon">
+                                        <a href="~/Admin/ListSanPham"><i class="icon nalika-home"></i></a>
+                                    </div>
+                                    <div class="breadcomb-ctn">
+                                        <h2>Product Edit</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                <div class="breadcomb-report">
+                                    <button data-toggle="tooltip" data-placement="left" title="Download Report" class="btn"><i class="icon nalika-download"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="single-product-tab-area mg-b-30">
+        <!-- Single pro tab review Start-->
+        <div class="single-pro-review-area">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="review-tab-pro-inner">
+                            <ul id="myTab3" class="tab-review-design" style="padding-left:500px">
+                                <li class="active"><a href="#description"><i class="icon nalika-edit" aria-hidden="true"></i> Thêm Loại Sản Phẩm</a></li>
+                            </ul>
+                            <div id="myTabContent" class="tab-content custom-product-edit">
+                                <div class="product-tab-list tab-pane fade active in" id="description">
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                            <div class="review-content-section">
+                                                <div class="input-group mg-b-pro-edt" style="padding : 10px 120px">
+                                                    <span class="input-group-addon"><i class="icon nalika-edit" aria-hidden="true"></i></span>
+                                                    @Html.EditorFor(model => model.tenSP, new { htmlAttributes = new { @class = "form-control" } })
+                                                </div>
+                                                <div style="margin-left : 120px">
+                                                    @Html.ValidationMessageFor(model => model.tenSP, "", new { @class = "text-danger" })
+                                                </div>
+                                                <div class="input-group mg-b-pro-edt" style="padding : 10px 120px">
+                                                    <span class="input-group-addon"><i class="icon nalika-edit" aria-hidden="true"></i></span>
+                                                    @Html.EditorFor(model => model.GiaBan, new { htmlAttributes = new { @class = "form-control" } })
+
+                                                </div>
+                                                <div style="margin-left : 120px">
+                                                    @Html.ValidationMessageFor(model => model.GiaBan, "", new { @class = "text-danger" })
+                                                </div>
+                                                <div class="input-group mg-b-pro-edt" style="padding : 10px 120px">
+                                                    <span class="input-group-addon"><i class="icon nalika-edit" aria-hidden="true"></i></span>
+                                                    @Html.EditorFor(model => model.Hinh, new { htmlAttributes = new { @class = "form-control" } })
+
+
+                                                </div>
+                                                <div style="margin-left : 120px">
+                                                    @Html.ValidationMessageFor(model => model.Hinh, "", new { @class = "text-danger" })
+                                                </div>
+                                                <div class="input-group" style="padding-left:118px;width:400px">
+                                                    <span class="input-group-addon"><i class="icon nalika-edit" aria-hidden="true"></i></span>
+                                                    <div style="width:310px">
+                                                        @Html.DropDownList("LoaiSanPhamId", null, htmlAttributes: new { @class = "form-control" })
+                                                    </div>
+                                                </div>
+                                                <div style="margin-left : 120px">
+                                                    @Html.ValidationMessageFor(model => model.LoaiSanPhamId, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                            <div class="review-content-section">
+                                                <div class="col-md-6">
+                                                    <input type="file" name="fileUpload" id="fileUpload" accept="image/*"
+                                                           style="display:none;" />
+                                                    <div>
+                                                        <img src="@Model.Hinh" id="pictureUpload" style="width:300px" />
+                                                    </div>
+                                                </div>
+                                                <div class="row" style="padding-top:170px">
+                                                    <input type="button" id="btnUpload" value="Chọn" class="btn btn-ctl-bt waves-effect waves-light m-r-10" />
+                                                </div>
+                                                @section upload
+{
+                                                    <script>
+                                                        $(function () {
+                                                            $('#btnUpload').click(function () {
+                                                                $('#fileUpload').trigger('click');
+                                                            });
+                                                        });
+                                                        $('#fileUpload').change(function () {
+                                                            if (window.FormData !== undefined) {
+                                                                var fileUpload = $('#fileUpload').get(0);
+                                                                var files = fileUpload.files;
+                                                                var formData = new FormData();
+                                                                formData.append('file', files[0]);
+
+                                                                $.ajax(
+                                                                    {
+                                                                        type: 'POST',
+                                                                        url: '/Admin/ProcessUpload',
+                                                                        contentType: false,
+                                                                        processData: false,
+                                                                        data: formData,
+                                                                        success: function (urlImage) {
+
+                                                                            $('#pictureUpload').attr('src', urlImage);
+                                                                            $('#Hinh').val(urlImage);
+                                                                        },
+                                                                        error: function (err) {
+                                                                            alert('Error ', err.statusText);
+                                                                        }
+                                                                    });
+                                                            }
+                                                        });
+                                                    </script>
+                                                }
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-right:150px">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <div class="text-center custom-pro-edt-ds">
+                                                <button type="submit" class="btn btn-ctl-bt waves-effect waves-light m-r-10">
+                                                    Sửa
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

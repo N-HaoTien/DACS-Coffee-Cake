@@ -1,0 +1,53 @@
+﻿@model IEnumerable<DOAN_COSO.Models.ChiTietHoaDon>
+
+<div class="modal fade" id="DetailsDH">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Chi Tiết Hóa Đơn</h4>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>X</span>
+                </button>
+            </div>
+            <table>
+
+                <thead class="thead-primary">
+                    <tr class="text-center">
+                        <th>Mã Đơn Hàng</th>
+                        <th>Ngày Đặt</th>
+                        <th>Ngày Giao</th>
+                        <th>Thành Tiền</th>
+                        <th>Trạng Thái</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+
+                    <tr class="text-center productlayluon">
+                        <td class="product-name">
+                            <h3>@item.IdHoaDon</h3>
+                        </td>
+                        <td class="image-prod"><div class="img" style="background-image:url(@item.SanPham.Hinh)"></div></td>
+
+                        <td class="product-name">
+                            <h3>@item.SanPham.tenSP</h3>
+                        </td>
+
+                        <td class="price">@item.SanPham.GiaBan</td>
+
+                        <td class="quantity">
+                            <div class="input-group mb-3">
+                                <input type="text" class="abcquantity quantity form-control input-number" value="@item.SoLuong">
+                            </div>
+                        </td>
+
+                        <td class="total ThanhTien">@(item.SanPham.GiaBan * item.SoLuong)</td>
+                    </tr><!-- END TR-->
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

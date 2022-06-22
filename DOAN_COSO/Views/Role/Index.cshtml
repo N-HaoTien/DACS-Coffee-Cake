@@ -1,0 +1,80 @@
+﻿@model PagedList.IPagedList<DOAN_COSO.Models.RoleViewModel>
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "ListSanPham";
+    Layout = "~/Views/Shared/LayoutAdmin.cshtml";
+}
+
+<div class="product-status mg-b-30">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="product-status-wrap">
+                    <div class="breadcomb-wp" style="margin-bottom:20px">
+                        <div class="breadcomb-icon">
+                            <a href="~/Role/Index"><i class="icon nalika-home"></i></a>
+                        </div>
+                        <div class="breadcomb-ctn" style="margin-left:15px;margin-top:15px">
+                            <h2>Quản Lý Phân Quyền</h2>
+                        </div>
+                    </div>
+                    <div class="add-product">
+                        <a href="~/Role/Create">Thêm Quyền</a>
+                    </div>
+                    <div>
+                        @Html.Partial("_Message")
+                    </div>
+
+                    <table>
+                        <tr>
+                            <th>Họ và Tên</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Action</th>
+                        </tr>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                @Html.HiddenFor(m => item.UserId)
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Username)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Email)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Role)
+                                </td>
+                                <td>
+                                    <button data-toggle="tooltip" title="Edit" class="pd-setting-ed" onclick="location.href = '@Url.Action("ManageRoles", new { userId = item.UserId })'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>
+                                </td>
+
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div style="margin-left:15px">
+    <div>
+        <p class="text-primary">
+            Trang <strong class="text-danger">@(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber)</strong> /
+            @Model.PageCount
+        </p>
+    </div>
+    <div class="MenuTrang">
+        @Html.PagedListPager(Model, page => Url.Action("Index", new
+        {
+            page = page
+        }))
+    </div>
+</div>
+<style>
+    .MenuTrang li {
+        display: inline;
+    }
+</style>

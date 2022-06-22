@@ -1,0 +1,84 @@
+﻿@model IEnumerable<DOAN_COSO.Models.SanPham>
+@using DOAN_COSO.Models
+@using System.Data.Entity;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ApplicationDbContext db = new ApplicationDbContext();
+
+    var query = db.ChiTietHoaDons.Include(n => n.SanPham.LoaiSanPham)
+                .GroupBy(p => p.SanPham)
+                .Select(g => new SanPhamViewModel()
+                {
+                    IDSP = g.Key.IDSP,
+                    tenSP = g.Key.tenSP,
+                    count = g.Sum(w => w.SoLuong),
+                    Hinh = g.Key.Hinh,
+                    GiaBan = g.Key.GiaBan,
+                    TenLoaiSP = g.Key.LoaiSanPham.tenLoaiSP,
+                    TinhTrang = g.Key.TinhTrang
+                })
+                .OrderByDescending(p => p.count).Take(3).ToList();
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<div id="change">
+    <table class="table">
+        <tr>
+            <th>
+                IDSP
+            </th>
+            <th>
+                Tên Loại
+            </th>
+            <th>
+                Tên SP
+            </th>
+            <th>
+                Hình
+            </th>
+            <th>
+                Giá Bán
+            </th>
+            <th>
+                Tình Trạng
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in query)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IDSP)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TenLoaiSP)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.tenSP)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Hinh)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.GiaBan)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TinhTrang)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.IDSP }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.IDSP }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.IDSP })
+                </td>
+            </tr>
+        }
+    </table>
+</div>
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>

@@ -1,0 +1,49 @@
+﻿@model IEnumerable<DOAN_COSO.Models.SanPhamViewModel>
+
+@{
+    ViewBag.Title = "ViewSearchCheckBox";
+    var list = ViewBag.list;
+}
+    <div id="change">
+        <table class="table">
+            <tr>
+                <th>
+                    Tên Loại Sản Phẩm
+                </th>
+                <th>
+                    Tên
+                </th>
+                <th>
+                    Hình
+                </th>
+                <th>
+                    Giá
+                </th>
+                <th>
+                    Trạng Thái
+                </th>
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    
+                    <td>
+                        @Html.DisplayFor(modelItem => item.tenSP)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Hinh)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.GiaBan)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TinhTrang)
+                    </td>
+
+                </tr>
+            }
+        </table>
+    </div>
+

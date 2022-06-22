@@ -1,0 +1,16 @@
+﻿@if (TempData.ContainsKey("ThongBao"))
+{
+    var ms = (XMessage)TempData["ThongBao"];
+<div class="alert alert-@ms.Type alert-st-one" role="alert">
+    <i class="fa fa-check adminpro-checked-pro admin-check-pro admin-check-pro-none" aria-hidden="true"></i>
+    <p class="message-mg-rt message-alert-none"><strong>Thành Công!</strong> @ms.Messeage</p>
+</div>
+}
+@if (TempData.ContainsKey("ThongBaoX"))
+{
+    var ms = (XMessage)TempData["ThongBaoX"];
+<div class="alert alert-@ms.Type alert-st-one" role="alert">
+    <i class="fa fa-check adminpro-checked-pro admin-check-pro admin-check-pro-none" aria-hidden="true"></i>
+    <p class="message-mg-rt message-alert-none"><strong>Thành Công!</strong> @ms.Messeage</p>
+</div>
+}

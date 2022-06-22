@@ -1,0 +1,227 @@
+﻿@model IEnumerable<DOAN_COSO.Models.SanPham>
+@using System.Data.Entity;
+@using DOAN_COSO.Models;
+
+@{
+    ViewBag.Title = "TrangChu";
+    Layout = "~/Views/Shared/LayoutTrangChu.cshtml";
+    @*<div class="col-lg-9 product-details pl-md-1 ftco-animate" style="margin-left:45px">
+            <div class="input-group ">
+                @Html.TextBox("Quantity", 1, new { type = "number", min = "1", max = "100", @class = "form-control input-number" })
+            </div>
+        </div>*@
+
+    @*select b.RoleId from AspNetUserRoles b, AspNetUsers c where b.UserId = c.Id and
+        b.RoleId = (select a.Id from AspNetRoles a where a.Id = b.RoleId and a.Name = 'Customer' group by a.Id)*@
+DOAN_COSO.Models.ApplicationDbContext db = new DOAN_COSO.Models.ApplicationDbContext();
+var listCF = db.SanPhams.Include(p => p.LoaiSanPham).Where(p => p.LoaiSanPham.tenLoaiSP == "Cafe").ToList();
+ViewBag.listProduct = db.SanPhams.Count();
+var usersWithRoles = (from user in db.Users
+                      from userRole in user.Roles
+                      join role in db.Roles on userRole.RoleId equals role.Id
+                      where role.Name == "Customer"
+                      select user.Id
+                        ).ToList();
+var usersWithRoles1 = (from user in db.Users
+                       from userRole in user.Roles
+                       join role in db.Roles on userRole.RoleId equals role.Id
+                       where role.Name != "Customer"
+                       select user.Id
+                        ).ToList();
+
+var query = db.ChiTietHoaDons.Include(p => p.SanPham)
+               .GroupBy(p => p.SanPham)
+               .Select(g => new
+               {
+                   SanPham = g.Key,
+                   count = g.Sum(w => w.SoLuong)
+               })
+               .OrderByDescending(p => p.count).Take(3).ToList();
+
+var NewProduct = db.SanPhams.OrderByDescending(p => p.IDSP).Take(3).ToList();
+}
+<div id="change">
+
+    <section class="ftco-section">
+        <div class="container">
+            <div class="row justify-content-center mb-5 pb-3">
+                <div class="col-md-7 heading-section ftco-animate text-center">
+                    <h2 class="mb-4">Danh Sách Sản Phẩm</h2>
+                </div>
+            </div>
+            <div class="row">
+                @foreach (var item in Model)
+                {
+
+                    <div class="col-md-3">
+                        <div class="menu-entry">
+                            <div class="text text-center pt-4">
+                                <a href="@Url.Action("Details","Home", new { id = item.IDSP})" class="img" style="background-image: url(@item.Hinh);margin-bottom:10px"></a>
+                                <h3><a href="@Url.Action("Details","Home", new { id = item.IDSP})">@item.tenSP</a></h3>
+                                <h3><a href="@Url.Action("Details","Home", new { id = item.IDSP})">@item.GiaBan.ToString("#,##0")</a></h3>
+
+                                <p><a data-id="@item.IDSP" class="ajax-add-to-cart btn btn-primary btn-outline-primary">Thêm vào giỏ hàng</a></p>
+
+                            </div>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </section>
+</div>
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+
+
+
+<section class="ftco-counter ftco-bg-dark img" id="section-counter" style="background-image: url(images/bg_2.jpg);" data-stellar-background-ratio="0.5">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="row">
+                    <div class="col-md-6 col-lg-3 d-flex justify-content-center counter-wrap ftco-animate">
+                        <div class="block-18 text-center">
+                            <div class="text">
+                                <div class="icon"><span class="flaticon-coffee-cup"></span></div>
+                                <strong class="number" data-number="@listCF.Count()"></strong>
+                                <span>Sản phẩm về Coffee</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3 d-flex justify-content-center counter-wrap ftco-animate">
+                        <div class="block-18 text-center">
+                            <div class="text">
+                                <div class="icon"><span class="flaticon-coffee-cup"></span></div>
+                                <strong class="number" data-number="@ViewBag.listProduct"></strong>
+                                <span>Số Lượng Sản Phẩm</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3 d-flex justify-content-center counter-wrap ftco-animate">
+                        <div class="block-18 text-center">
+                            <div class="text">
+                                <div class="icon"><span class="flaticon-coffee-cup"></span></div>
+                                <strong class="number" data-number="@usersWithRoles.Count()"></strong>
+                                <span>Số lượng Khách Hàng</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3 d-flex justify-content-center counter-wrap ftco-animate">
+                        <div class="block-18 text-center">
+                            <div class="text">
+                                <div class="icon"><span class="flaticon-coffee-cup"></span></div>
+                                <strong class="number" data-number="@usersWithRoles1.Count()"></strong>
+                                <span>Nhân Viên</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="ftco-menu">
+    <div class="container">
+        
+        <div class="row d-md-flex" style="padding-left: 40px;">
+            <div class="col-lg-12 ftco-animate p-md-5">
+                <div class="row">
+                    <div class="col-md-12 nav-link-wrap mb-5">
+                        <div class="nav ftco-animate nav-pills justify-content-center" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                            <a class="nav-link active" id="v-pills-1-tab" data-toggle="pill" href="#v-pills-1" role="tab" aria-controls="v-pills-1" aria-selected="true">Sản Phẩm Bán Chạy</a>
+
+                            <a class="nav-link" id="v-pills-2-tab" data-toggle="pill" href="#v-pills-2" role="tab" aria-controls="v-pills-2" aria-selected="false">Sản phẩm mới nhất</a>
+
+                            
+                        </div>
+                    </div>
+                    <div class="col-md-12 d-flex align-items-center">
+
+                        <div class="tab-content ftco-animate" id="v-pills-tabContent">
+
+                            <div class="tab-pane fade show active" id="v-pills-1" role="tabpanel" aria-labelledby="v-pills-1-tab">
+                                <div class="row">
+                                    @foreach (var item in query.Select(p => p.SanPham))
+                                    {
+                                        <div class="col-md-4 text-center">
+                                            <div class="menu-wrap">
+                                                <a href="@Url.Action("Details","Home", new { id = item.IDSP})" class="menu-img img mb-4" style="background-image: url(@item.Hinh);width: 300px"></a>
+                                                <div class="text">
+                                                    <h3><a href="@Url.Action("Details","Home", new { id = item.IDSP})">@item.tenSP</a></h3>
+                                                    <p class="price"><span>@item.GiaBan.ToString("#,##0")</span></p>
+                                                    <p><a data-id="@item.IDSP" href="#" class="ajax-add-to-cart btn btn-primary btn-outline-primary">Thêm Vào Giỏ Hàng</a></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    
+                                    <!-- ../cssForCoffee/images/dish-3.jpg -->
+
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="v-pills-2" role="tabpanel" aria-labelledby="v-pills-2-tab">
+                                <div class="row">
+                                    @foreach (var item in NewProduct)
+                                    {
+                                        <div class="col-md-4 text-center">
+                                            <div class="menu-wrap">
+                                                <a href="@Url.Action("Details","Home", new { id = item.IDSP})" class="menu-img img mb-4" style="background-image: url(@item.Hinh); width:300px"></a>
+                                                <div class="text">
+                                                    <h3><a href="@Url.Action("Details","Home", new { id = item.IDSP})">@item.tenSP</a></h3>
+                                                    <p class="price"><span>@item.GiaBan.ToString("#,##0")</span></p>
+                                                    <p><a data-id="@item.IDSP" href="#" class="ajax-add-to-cart btn btn-primary btn-outline-primary">Thêm Vào Giỏ Hàng</a></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+@section Addtocart{
+    <script>
+        $(document).ready(function () {
+            $(".ajax-add-to-cart").click(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    type: 'Post',
+                    url: '/GioHang/AddToCart',
+                    data: {
+                        IDSP: $(this).data("id"),
+                        quantity: 1
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        console.log(data);
+                        $('#CartCount').text(data.Count);
+                        $('#CartSum').text(data.Sum);
+                        toastr.options =
+                        {
+                            "closeButton": true,
+                            "progressBar": true
+                        }
+                        toastr.success("Bạn Đã Thêm Sản Phẩm vào giỏ hàng", "Thông Báo");
+                    },
+                    error: function () {
+                        alert("Lỗi trong khi thêm vào giỏ hàng!");
+                    }
+                });
+                return false;
+            });
+        });
+    </script>
+}

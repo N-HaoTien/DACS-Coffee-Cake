@@ -1,0 +1,51 @@
+﻿@using Microsoft.AspNet.Identity
+@{
+    string Name = "";
+    if (string.IsNullOrEmpty(Session["FullName"] as string))
+    {
+    }
+    else
+    {
+        Name = Session["FullName"].ToString();
+
+    }
+    }
+@if (Request.IsAuthenticated)
+{
+    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" }))
+    {
+        @Html.AntiForgeryToken()
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                @Name
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                @if (User.IsInRole("Customer") == false)
+                {
+                    <li>
+                        <a href="@Url.Action("ThongKe","Admin")">Trang Quản Lý</a>
+                    </li>
+                }
+                <li>
+                    <a href="@Url.Action("EditProfile","Account", new {Id = User.Identity.GetUserId() })">Thông Tin Cá Nhân</a>
+                </li>
+                <li>
+                    <a href="@Url.Action("ChangePassword", "Manage",new { UserId = User.Identity.GetUserId() })">Đổi Mật Khẩu</a>
+                </li>
+                <li>
+                    <a href="@Url.Action("DonHangKH","Home",new { UserId = User.Identity.GetUserId() })">Kiểm Tra Đơn Hàng</a>
+                </li>
+                <li role="separator" class="divider"></li>
+                <li><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>
+            </ul>
+        </li>
+    }
+}
+else
+{
+    <div>
+        @Html.ActionLink("Đăng Ký", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })
+        @Html.ActionLink("Đăng Nhập", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })
+    </div>
+}

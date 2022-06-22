@@ -1,0 +1,85 @@
+﻿@model IEnumerable<DOAN_COSO.Models.ChiTietHoaDon>
+@{
+
+    ViewBag.TongSL = Model.Count();
+    ViewBag.TongSLSP = Model.Sum(p => p.SoLuong);
+    ViewBag.TongTien = Model.Sum(p => p.SanPham.GiaBan * p.SoLuong);
+}
+<style>
+    .modal {
+        text-align: left;
+        margin-left: 185px;
+        margin-top:20px
+    }
+    .modal-dialog {
+        display: inline-block;
+        text-align: left;
+        vertical-align: middle;
+    }
+    .modal-content{
+        width:1200px;
+    }
+</style>
+<div id="DetailsDH" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content" id="Body">
+            <div class="modal-header">
+                <h2 class="modal-title" style="color :black;font-family:Arial">Chi tiết hóa đơn</h2>
+            </div>
+            <div class="modal-body">
+                <table class="table">
+                    <thead>
+                        <tr class="text-dark">
+                            <th>Tên Sản Phẩm</th>
+                            <th>Giá</th>
+                            <th>Số Lượng</th>
+                            <th>Thành Tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            @Html.HiddenFor(p => item.IdHoaDon)
+                            <tr>
+                                <td>
+                                    <h3 class="text-dark">@item.SanPham.tenSP</h3>
+                                </td>
+
+                                <td class="text-dark">@item.SanPham.GiaBan.ToString("#,##0")</td>
+
+                                <td>
+                                    <div class="text-dark">
+                                        @item.SoLuong
+                                    </div>
+                                </td>
+
+                                <td class="text-dark">@(item.SanPham.GiaBan * item.SoLuong)</td>
+                            </tr><!-- END TR-->
+                        }
+                    </tbody>
+                </table>
+                <div class="row justify-content-center">
+                    <div class="cart-total mb-3">
+                        <h3>Cart Totals</h3>
+                        <p class="d-flex">
+                            <span class="text-dark">Tổng Số Lượng:</span>
+                            <span class="text-dark">@ViewBag.TongSLSP</span>
+                        </p>
+                        <p class="d-flex">
+                            <span style="color:black">Số Món:</span>
+                            <span style="color:black">@ViewBag.TongSL</span>
+                        </p>
+                        <hr>
+                        <p class="d-flex total-price">
+                            <span style="color:black">Tổng Tiền</span>
+                            <span class="text-danger">@ViewBag.TongTien</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
